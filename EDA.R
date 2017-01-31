@@ -58,7 +58,13 @@ summary(ames_train$price);quantile((ames_train$price))
 build<-ames_train %>% select(Year.Built) %>% mutate(plus99=if_else(Year.Built > 1999,1,0))
 table(build$plus99)
 272*100/728
-
 #question 7: A.over 30 percent of houses
+
+
+#question 8
+#INCOMPLETA
+#question 8
+
+
 
 
