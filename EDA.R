@@ -22,3 +22,19 @@ str(ames_train)
 ames_train$MS.SubClass <- as.factor(ames_train$MS.SubClass)
 ames_train$Overall.Qual <- as.factor(ames_train$Overall.Qual)
 ames_train$Overall.Cond <- as.factor(ames_train$Overall.Cond)
+
+StoneBr<-ames_train %>%  filter(Neighborhood == "StoneBr") %>% select(price)
+Timber<-ames_train %>%  filter(Neighborhood == "Timber") %>% select(price)
+Veenker<-ames_train %>%  filter(Neighborhood == "Veenker") %>% select(price)
+NridgHt<-ames_train %>%  filter(Neighborhood == "NridgHt") %>% select(price)
+
+sd(StoneBr$price)
+sd(Timber$price)
+sd(Veenker$price)
+sd(NridgHt$price)
+
+#question 3: StoneBr
+
+
+
+
