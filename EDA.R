@@ -72,5 +72,17 @@ ggpairs(subsetmodel) #area(0.71) ,Year.build(0.577),Total.Bsmt.SF(0.688),garage.
 
 subs2<-ames_train %>% select(price,area,Total.Bsmt.SF) %>% filter(!is.na(Total.Bsmt.SF))
 mod<- lm(log(price) ~  log(area) + Total.Bsmt.SF ,data = subs2)
-
 summary(mod)
+#question 9 : 0.752
+
+#question 10
+#question 10
+
+#question 11
+plot(log(ames_train$price),log(ames_train$area))
+#question 11
+
+
+
+
+   
