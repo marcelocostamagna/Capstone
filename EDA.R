@@ -65,6 +65,12 @@ table(build$plus99)
 #INCOMPLETA
 #question 8
 
+#question 9
+subsetmodel<-ames_train %>% select(price, area, Lot.Frontage,Lot.Area,Year.Built,Year.Remod.Add,Mas.Vnr.Area,BsmtFin.SF.1,BsmtFin.SF.2,Total.Bsmt.SF,Full.Bath,Bedroom.AbvGr,Kitchen.AbvGr,TotRms.AbvGrd,Fireplaces,Garage.Cars,Garage.Area,Yr.Sold)
 
+ggpairs(subsetmodel) #area(0.71) ,Year.build(0.577),Total.Bsmt.SF(0.688),garage.cars(0.665)
 
+subs2<-ames_train %>% select(price,area,Total.Bsmt.SF) %>% filter(!is.na(Total.Bsmt.SF))
+mod<- lm(log(price) ~  log(area) + Total.Bsmt.SF ,data = subs2)
 
+summary(mod)
