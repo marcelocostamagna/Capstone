@@ -62,8 +62,13 @@ table(build$plus99)
 
 
 #question 8
-#INCOMPLETA
-#question 8
+garage<-ames_train %>% mutate(gar=if_else(is.na(Garage.Type),"NO","YES")) %>% select(area,gar)
+
+?inference()
+inference(y = area, x = as.factor(gar), data = garage, statistic = "mean", type = "ht", null = 0, 
+          alternative = "less", method = "theoretical", sig_level = 0.05, conf_level = 0.95)
+
+#question 8: p-value < 0.0001
 
 #question 9
 subsetmodel<-ames_train %>% select(price, area, Lot.Frontage,Lot.Area,Year.Built,Year.Remod.Add,Mas.Vnr.Area,BsmtFin.SF.1,BsmtFin.SF.2,Total.Bsmt.SF,Full.Bath,Bedroom.AbvGr,Kitchen.AbvGr,TotRms.AbvGrd,Fireplaces,Garage.Cars,Garage.Area,Yr.Sold)
@@ -107,8 +112,25 @@ asd<-ames_train %>% mutate(fam=if_else(Bldg.Type=="1Fam",1,0)) %>%
   #question 13: 0
 
 #question 14
+plot(log(ames_train$area), ames_train$Bedroom.AbvGr)
+cor(log(ames_train$area), ames_train$Bedroom.AbvGr)
+ames_train %>% select(Bedroom.AbvGr, area) %>% 
+  group_by(Bedroom.AbvGr) %>% 
+  summarise(mean=mean(log(area)),median(log(area)))
+#question 14: NO
 
-#question 14
+#question 15
+ames_train %>% 
+  select(BsmtFin.Type.1,BsmtFin.Type.2,Bsmt.Unf.SF) %>%
+  filter( BsmtFin.Type.2 =="Unf" ) %>% 
+  summary()
+#question 15: 614
+
+
+
+
+
+
 
 
 
