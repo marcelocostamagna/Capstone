@@ -80,8 +80,35 @@ summary(mod)
 
 #question 11
 plot(log(ames_train$price),log(ames_train$area))
-#question 11
+ames_train %>% select(price,area) %>% ggplot(aes(x=log(area), y=log(price))) + 
+  geom_point() +
+  geom_smooth(method = "lm")
 
+tmp<-ames_train %>%  
+  mutate(log_price=log(price), log_area=log(area)) 
+ 
+  v1<- tmp %>%  filter(log_price < 10)
+  v2<-tmp %>% filter(log_area > 8.3)
+  v3<-tmp %>% filter(log_area < 6)
+  v4<-  bind_rows(v1,v2,v3)
+  v4
+
+tmp
+#question 11: They had abnormal sale conditions. 
+
+#question 12
+hist(ames_train$price)
+summary(ames_train$price)
+#question 12: price is right skewed
+
+#question 13
+asd<-ames_train %>% mutate(fam=if_else(Bldg.Type=="1Fam",1,0)) %>%
+  group_by(Neighborhood) %>% count(fam) 
+  #question 13: 0
+
+#question 14
+
+#question 14
 
 
 
