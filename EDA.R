@@ -18,7 +18,7 @@ ames_train <- as.data.frame(ames_train)
 
 str(ames_train)
 
-# Question 2 : 3 
+# Question 2 : 2
 #question 3
 #MS.SubClass  Overall.Qual  Overall.Cond 
 ames_train$MS.SubClass <- as.factor(ames_train$MS.SubClass)
@@ -50,15 +50,20 @@ cor(log(ames_train$price),log(ames_train$area))
 #question 5: Log-transform both price and area
 
 #question 6
-#INCOMPLETA
-# question 6 
+hg<-ames_train %>% mutate(haveGar= if_else( is.na(Garage.Type),0,1 )) %>% select(haveGar)
+table(hg)
+
+# question 6 :Beta(963, 47) 
 
 #question 7
 summary(ames_train$price);quantile((ames_train$price)) 
 build<-ames_train %>% select(Year.Built) %>% mutate(plus99=if_else(Year.Built > 1999,1,0))
 table(build$plus99)
-272*100/728
-#question 7: A.over 30 percent of houses
+272*100/1000 # 27.2
+
+mt<-ames_train %>% mutate( ba=is.na(Bsmt.Qual),0,1) %>% select(ba)
+table(mt)
+#question 7: 21 houses do not have basement
 
 
 #question 8
@@ -81,25 +86,25 @@ summary(mod)
 #question 9 : 0.752
 
 #question 10
-#question 10
+#question 10:Mean: 3.62, SD: 0.16
 
 #question 11
+#When regressing log(price) on log(area), there are some outliers. 
+#Which of the following do the three most outlying points have in common?
 plot(log(ames_train$price),log(ames_train$area))
 ames_train %>% select(price,area) %>% ggplot(aes(x=log(area), y=log(price))) + 
   geom_point() +
   geom_smooth(method = "lm")
 
-tmp<-ames_train %>%  
-  mutate(log_price=log(price), log_area=log(area)) 
- 
-  v1<- tmp %>%  filter(log_price < 10)
-  v2<-tmp %>% filter(log_area > 8.3)
-  v3<-tmp %>% filter(log_area < 6)
-  v4<-  bind_rows(v1,v2,v3)
-  v4
+mdl <- lm(log(price)~ log(area), data=ames_train)
+summary(mdl)
+resDF<-data.frame(res=abs(mdl$residuals))
+am_res <- bind_cols(ames_train,resDF)
 
-tmp
-#question 11: They had abnormal sale conditions. 
+am_res %>% arrange(desc( res)) %>% top_n(3) %>% select(res,Bedroom.AbvGr,Overall.Qual,Year.Built)
+
+
+#question 11: They where built before 1930 
 
 #question 12
 hist(ames_train$price)
@@ -107,9 +112,10 @@ summary(ames_train$price)
 #question 12: price is right skewed
 
 #question 13
-asd<-ames_train %>% mutate(fam=if_else(Bldg.Type=="1Fam",1,0)) %>%
-  group_by(Neighborhood) %>% count(fam) 
-  #question 13: 0
+asd<-ames_train %>% mutate(one_fam=if_else(Bldg.Type=="1Fam","yes","no")) %>%
+  group_by(Neighborhood) %>% count(one_fam) 
+asd  
+#question 13: 3
 
 #question 14
 plot(log(ames_train$area), ames_train$Bedroom.AbvGr)
@@ -117,14 +123,21 @@ cor(log(ames_train$area), ames_train$Bedroom.AbvGr)
 ames_train %>% select(Bedroom.AbvGr, area) %>% 
   group_by(Bedroom.AbvGr) %>% 
   summarise(mean=mean(log(area)),median(log(area)))
-#question 14: NO
+#question 14: YES
 
 #question 15
 ames_train %>% 
-  select(BsmtFin.Type.1,BsmtFin.Type.2,Bsmt.Unf.SF) %>%
-  filter( BsmtFin.Type.2 =="Unf" ) %>% 
+  filter(!is.na(Bsmt.Unf.SF)) %>% 
+  filter( BsmtFin.Type.2 =="Unf" || BsmtFin.Type.1 =="Unf" ) %>% 
+  select(Bsmt.Unf.SF) %>% summary()
+ 
+ames_train %>% 
+  filter(!is.na(Bsmt.Unf.SF)) %>% 
+  filter( BsmtFin.Type.1 =="Unf" ) %>% 
+  select(Bsmt.Unf.SF) %>% summary()
+  
   summary()
-#question 15: 614
+#question 15: 595
 
 
 
