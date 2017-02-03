@@ -60,12 +60,70 @@ nas %>% top_n(1)
 
 #Q4
 
+library(GGally)
+library(BAS)
 mod_ds<-ames_train %>% select(price,Lot.Area,Land.Slope,Year.Built,Year.Remod.Add,Bedroom.AbvGr)
+ggpairs(mod_ds)
 
+lm_price <- lm(log(price)~Lot.Area+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr, data= mod_ds)
+lm_price <- lm(log(price)~Lot.Area,Land.Slope,Year.Built,Year.Remod.Add,Bedroom.AbvGr , data= mod_ds)
+summary(lm_price)
+
+
+ bma_mod_bic <- bas.lm(log(price) ~ . , data=mod_ds,prior = "BIC", 
+                                       modelprior = uniform())
+
+image(bma_mod_bic,rotate=F)
+
+bma_mod_zel <- bas.lm(log(price) ~ . , 
+                  data=mod_ds,prior = "ZS-null",  #Zellner-Siow Cauchy prior
+                  modelprior = uniform())
+
+
+image(bma_mod_zel,rotate=F)
+
+plot(bma_mod_zel, which=1, add.smooth=F)
+
+summary(bma_mod_zel)
+bma_mod_zel$residuals
+data.frame(bma_mod_zel,which=1)
+bma_mod_zel
+?bas.lm
+
+coef.bas(bma_mod_zel)
+bma_mod_zel$which=2
+residuals.lm(bma_mod_zel)
+
+
+lm_price <- lm(log(price)~Lot.Area+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , data= mod_ds)
+resDF<-data.frame(residuals=(abs(lm_price$residuals))^2)
+mod_ds_res<-cbind(mod_ds ,resDF)
+mod_ds_res %>% arrange(desc(residuals)) %>% head(5) 
+
+top_n(5,residuals) %>% 
+
+plot(ames_train$Year.Built,ames_train$price)
+
+plot(sqrt(abs(lm_price$residuals)))
+
+summary(ames_train$Year.Built)
 #Q4
 
+#Q5
+
+bma_mod_bic_log <- bas.lm(log(price) ~log( Lot.Area)+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "BIC", 
+                      modelprior = uniform())
+
+image(bma_mod_bic_log,rotate=F)
+
+bma_mod_zel_log <- bas.lm(log(price) ~ log(Lot.Area)+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "ZS-null",  #Zellner-Siow Cauchy prior
+                      modelprior = uniform())
 
 
+image(bma_mod_zel_log,rotate=F)
+#Q5
 
 
 

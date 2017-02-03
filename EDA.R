@@ -88,7 +88,7 @@ summary(mod)
 #question 10
 #question 10:Mean: 3.62, SD: 0.16
 
-#question 11
+#question 11 !!!!!!!
 #When regressing log(price) on log(area), there are some outliers. 
 #Which of the following do the three most outlying points have in common?
 plot(log(ames_train$price),log(ames_train$area))
