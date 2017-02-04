@@ -1,0 +1,134 @@
+---
+title: "Peer Assessment I"
+output:
+  html_document: 
+    pandoc_args: [
+      "--number-sections",
+    ]
+---
+
+
+First, let us load the data and necessary packages:
+
+```{r load, message = FALSE}
+load("ames_train.Rdata")
+library(MASS)
+library(dplyr)
+library(ggplot2)
+```
+
+#
+Make a labeled histogram (with 30 bins) of the ages of the houses in the data set, and describe the distribution.
+
+
+```{r Q1}
+# type your code for Question 1 here, and Knit
+
+```
+
+
+* * *
+
+NOTE: Write your written response to Question 1 here.  Delete this note before you submit your work.
+
+
+* * *
+
+
+#
+The mantra in real estate is "Location, Location, Location!" Make a graphical display that relates a home price to its neighborhood in Ames, Iowa. Which summary statistics are most appropriate to use for determining the most expensive, least expensive, and most heterogeneous (having the most variation in housing price) neighborhoods? Report which neighborhoods these are based on the summary statistics of your choice. Report the value of your chosen summary statistics for these neighborhoods.
+
+
+```{r Q2}
+# type your code for Question 2 here, and Knit
+
+```
+
+
+* * *
+
+NOTE: Write your written response to Question 2 here.  Delete this note before you submit your work.
+
+
+
+* * *
+
+# 
+
+Which variable has the largest number of missing values? Explain why it makes sense that there are so many missing values for this variable.
+
+```{r Q3}
+# type your code for Question 3 here, and Knit
+
+```
+
+
+* * *
+
+NOTE: Write your written response to Question 3 here.  Delete this note before you submit your work.
+
+
+* * *
+
+#
+
+We want to predict the natural log of the home prices. Candidate explanatory variables are lot size in square feet (Lot.Area), slope of property (Land.Slope), original construction date (Year.Built), remodel date (Year.Remod.Add), and the number of bedrooms above grade (Bedroom.AbvGr). Pick a model selection or model averaging method covered in the Specialization, and describe how this method works. Then, use this method to find the best multiple regression model for predicting the natural log of the home prices.
+
+
+```{r Q4}
+# type your code for Question 4 here, and Knit
+
+```
+
+* * *
+
+NOTE: Write your written response to Question 4 here.  Delete this note before you submit your work.
+
+
+* * *
+
+#
+
+Which home has the largest squared residual in the previous analysis (Question 4)? Looking at all the variables in the data set, can you explain why this home stands out from the rest (what factors contribute to the high squared residual and why are those factors relevant)?
+
+
+```{r Q5}
+# type your code for Question 5 here, and Knit
+
+```
+
+* * *
+
+NOTE: Write your written response to Question 5 here.  Delete this note before you submit your work.
+
+
+* * *
+
+#
+
+Use the same model selection method you chose in Question 4 to again find the best multiple regression model to predict the natural log of home prices, but this time **replacing Lot.Area with log(Lot.Area)**. Do you arrive at a model including the same set of predictors?
+
+
+```{r Q6}
+# type your code for Question 6 here, and Knit
+
+```
+
+* * *
+
+#
+
+Do you think it is better to log transform Lot.Area, in terms of assumptions for linear regression? Make graphs of the predicted values of log home price versus the true values of log home price for the regression models selected for Lot.Area and log(Lot.Area). Referencing these two plots, provide a written support that includes a quantitative justification for your answer in the first part of question 7.
+
+```{r Q7}
+# type your code for Question 7 here, and Knit
+
+```
+
+* * *
+
+NOTE: Write your written response to Question 7 here.  Delete this note before you submit your work.
+
+
+* * *
+###
