@@ -39,7 +39,7 @@ ames_train %>%
 
 * * *
 
-NOTE: Write your written response to Question 1 here.  Delete this note before you submit your work.
+The ages of the houses (taking 2017 as the actual value ) has a right skewed distribution.
 
 
 * * *
@@ -58,23 +58,34 @@ ames_train %>%
   theme(axis.text.x =   element_text(angle=45,  size=10)) +
    scale_y_continuous( labels = comma)
 
+
+```
+
+Box plot of price by neighborhood shows us at a simple glance the variations and help us to compare them in a simple way.
+Now we'll compute a summary grouped by neighborhood.
+
+```{r}
 nbh_dist<- ames_train %>% 
   group_by(Neighborhood) %>% 
   summarise(max=max(price), min=min(price),average=mean(price),median=median(price),std=sd(price))
 data.frame(nbh_dist)  
 
+
+
+```
+
+Then we'll select top values for min, max, avg and standard devation for price variable.
+
+```{r}
 nbh_dist %>% select(Neighborhood,max)  %>% top_n(1)
 nbh_dist %>% select(Neighborhood,min)  %>% top_n(-1) 
 nbh_dist %>% select(Neighborhood,average)  %>% top_n(1)
 nbh_dist %>% select(Neighborhood,std)  %>% top_n(1)
-
 ```
 
 
 * * *
 
-Box plot of price by neighborhood shows us at a simple glance the variations and help us to compare them in a simple way.
-Then we can confirm the behaviour of thisi variable with furher analysis.
 For this datset we can confirm that NridgHt has the more expensive house, Oldtown the cheapest. StoneBr has, in average, the more expensive houses and StoneBr has the more variable house price.
 
 
@@ -88,7 +99,7 @@ Which variable has the largest number of missing values? Explain why it makes se
 ```{r Q3}
 tmp<-data.frame(apply(ames_train, 2, function(x) length(which(is.na(x)))))
 nas <- cbind(rownames(tmp),tmp);
-rownames(nas)<-NULL;colnames(nas)<-c("Neib","Nas")
+rownames(nas)<-NULL;colnames(nas)<-c("Neighborhood","NAs")
 nas %>% top_n(1)
 
 ```
@@ -140,13 +151,13 @@ image(bma_mod_zel,rotate=F)
 
 ```
 
-We can see both model suggest to include all the columns
+We can see both model suggest to include all the columns and Zellner's approach has greater posterior odds.
 
 
 
 
 ```{r}
-plot(bma_mod_zel, which=1, add.smooth=F)
+
 
 summary(bma_mod_zel)
 
@@ -206,6 +217,7 @@ image(bma_mod_zel_log,rotate=F)
 
 * * *
 Checking both models, they suggest to remove Land.Slope as a predictor of log(price).
+So our final model won't contain Land.Slope and will have BIC as priori because of the greater posteriors odds.
 
 * * *
 
@@ -213,14 +225,30 @@ Checking both models, they suggest to remove Land.Slope as a predictor of log(pr
 
 Do you think it is better to log transform Lot.Area, in terms of assumptions for linear regression? Make graphs of the predicted values of log home price versus the true values of log home price for the regression models selected for Lot.Area and log(Lot.Area). Referencing these two plots, provide a written support that includes a quantitative justification for your answer in the first part of question 7.
 
+
+Let's create the final models with and without log transformation for Lot.Area.
+
 ```{r Q7}
-# type your code for Question 7 here, and Knit
+bma_mod_zel_log_final <- bas.lm(log(price) ~ log(Lot.Area)+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "BIC",  
+                      modelprior = uniform())
+bma_mod_zel_final <- bas.lm(log(price) ~ Lot.Area+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "BIC",
+                      modelprior = uniform())
 
 ```
 
+Now let's plot prediction and residuals for each model.
+
+```{r}
+plot(bma_mod_zel_final, which=1, add.smooth=F)
+plot(bma_mod_zel_log_final, which=1, add.smooth=F)
+```
+
+
 * * *
 
-NOTE: Write your written response to Question 7 here.  Delete this note before you submit your work.
+So by log transforming Lot.Area we can see we've reduced  residuals variability'
 
 
 * * *
