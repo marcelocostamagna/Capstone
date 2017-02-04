@@ -15,6 +15,9 @@ load("ames_train.Rdata")
 library(MASS)
 library(dplyr)
 library(ggplot2)
+library(scales)
+library(GGally)
+library(BAS)
 ```
 
 #
@@ -22,7 +25,14 @@ Make a labeled histogram (with 30 bins) of the ages of the houses in the data se
 
 
 ```{r Q1}
-# type your code for Question 1 here, and Knit
+ames_train %>%
+  mutate(age=2017-Year.Built) %>%
+  select(age) %>% 
+  ggplot(aes(x=age)) + 
+  geom_histogram(bins=30) +
+  ggtitle("Histogram by house years") +
+  theme(axis.text.x =   element_text(angle=40,  size=12))  
+
 
 ```
 
@@ -40,14 +50,32 @@ The mantra in real estate is "Location, Location, Location!" Make a graphical di
 
 
 ```{r Q2}
-# type your code for Question 2 here, and Knit
+ames_train %>% 
+  group_by(Neighborhood) %>% 
+  ggplot(aes(x=Neighborhood,y=price))+
+  geom_boxplot() +
+  ggtitle("Price Variations by Neighborhood") +
+  theme(axis.text.x =   element_text(angle=45,  size=10)) +
+   scale_y_continuous( labels = comma)
+
+nbh_dist<- ames_train %>% 
+  group_by(Neighborhood) %>% 
+  summarise(max=max(price), min=min(price),average=mean(price),median=median(price),std=sd(price))
+data.frame(nbh_dist)  
+
+nbh_dist %>% select(Neighborhood,max)  %>% top_n(1)
+nbh_dist %>% select(Neighborhood,min)  %>% top_n(-1) 
+nbh_dist %>% select(Neighborhood,average)  %>% top_n(1)
+nbh_dist %>% select(Neighborhood,std)  %>% top_n(1)
 
 ```
 
 
 * * *
 
-NOTE: Write your written response to Question 2 here.  Delete this note before you submit your work.
+Box plot of price by neighborhood shows us at a simple glance the variations and help us to compare them in a simple way.
+Then we can confirm the behaviour of thisi variable with furher analysis.
+For this datset we can confirm that NridgHt has the more expensive house, Oldtown the cheapest. StoneBr has, in average, the more expensive houses and StoneBr has the more variable house price.
 
 
 
@@ -58,14 +86,17 @@ NOTE: Write your written response to Question 2 here.  Delete this note before y
 Which variable has the largest number of missing values? Explain why it makes sense that there are so many missing values for this variable.
 
 ```{r Q3}
-# type your code for Question 3 here, and Knit
+tmp<-data.frame(apply(ames_train, 2, function(x) length(which(is.na(x)))))
+nas <- cbind(rownames(tmp),tmp);
+rownames(nas)<-NULL;colnames(nas)<-c("Neib","Nas")
+nas %>% top_n(1)
 
 ```
 
 
 * * *
 
-NOTE: Write your written response to Question 3 here.  Delete this note before you submit your work.
+NAs on Pool quality variable mean that the house does't have a swimming pool. So we can confirm that almost any house on Ames has a pool, at least for this observation dataset.
 
 
 * * *
@@ -75,14 +106,57 @@ NOTE: Write your written response to Question 3 here.  Delete this note before y
 We want to predict the natural log of the home prices. Candidate explanatory variables are lot size in square feet (Lot.Area), slope of property (Land.Slope), original construction date (Year.Built), remodel date (Year.Remod.Add), and the number of bedrooms above grade (Bedroom.AbvGr). Pick a model selection or model averaging method covered in the Specialization, and describe how this method works. Then, use this method to find the best multiple regression model for predicting the natural log of the home prices.
 
 
+We'll create a variable that contains the required columns for creating the regression model.
+
+
 ```{r Q4}
-# type your code for Question 4 here, and Knit
+mod_ds<-ames_train %>% select(price,Lot.Area,Land.Slope,Year.Built,Year.Remod.Add,Bedroom.AbvGr)
+ggpairs(mod_ds)
 
 ```
 
+
+
+The plot tells us about the relationship between all the columns.
+
+Now we'll create two different Bayesian models to analyse which colums to include in our model.
+The first model set the prior probablity as BIC and the second uses Zellner-Siow Cauchy prior.
+
+
+```{r}
+
+ bma_mod_bic <- bas.lm(log(price) ~ . , data=mod_ds,prior = "BIC", 
+                                       modelprior = uniform())
+
+image(bma_mod_bic,rotate=F)
+
+bma_mod_zel <- bas.lm(log(price) ~ . , 
+                  data=mod_ds,prior = "ZS-null",  
+                  modelprior = uniform())
+
+
+image(bma_mod_zel,rotate=F)
+
+
+```
+
+We can see both model suggest to include all the columns
+
+
+
+
+```{r}
+plot(bma_mod_zel, which=1, add.smooth=F)
+
+summary(bma_mod_zel)
+
+```
+
+
+
 * * *
 
-NOTE: Write your written response to Question 4 here.  Delete this note before you submit your work.
+Based on aour analysis we'll choose bma_mod_zel model that explains 56.2% of the variablity. The highest value of all the possible models.
 
 
 * * *
@@ -93,13 +167,16 @@ Which home has the largest squared residual in the previous analysis (Question 4
 
 
 ```{r Q5}
-# type your code for Question 5 here, and Knit
+lm_price <- lm(log(price)~Lot.Area+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , data= mod_ds)
+resDF<-data.frame(residuals=(abs(lm_price$residuals))^2)
+mod_ds_res<-cbind(mod_ds ,resDF)
+mod_ds_res %>% arrange(desc(residuals)) %>% head(1)
 
 ```
 
 * * *
-
-NOTE: Write your written response to Question 5 here.  Delete this note before you submit your work.
+We've created a linear model including 6 columns, then we've got the squared residuals.
+This home stands out from the rest mostly because it was built befor than 1930.
 
 
 * * *
@@ -109,10 +186,26 @@ NOTE: Write your written response to Question 5 here.  Delete this note before y
 Use the same model selection method you chose in Question 4 to again find the best multiple regression model to predict the natural log of home prices, but this time **replacing Lot.Area with log(Lot.Area)**. Do you arrive at a model including the same set of predictors?
 
 
+In order to answer this we'll create two new models (prior BIC and Zellner) but our explanatory variable Lot.Area will be treated as a natural log to evaluate how the model behaves and what should we keep or remove.
+
 ```{r Q6}
-# type your code for Question 6 here, and Knit
+bma_mod_bic_log <- bas.lm(log(price) ~log( Lot.Area)+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "BIC", 
+                      modelprior = uniform())
+
+image(bma_mod_bic_log,rotate=F)
+
+bma_mod_zel_log <- bas.lm(log(price) ~ log(Lot.Area)+Land.Slope+Year.Built+Year.Remod.Add+Bedroom.AbvGr , 
+                      data=mod_ds,prior = "ZS-null",  #Zellner-Siow Cauchy prior
+                      modelprior = uniform())
+
+
+image(bma_mod_zel_log,rotate=F)
 
 ```
+
+* * *
+Checking both models, they suggest to remove Land.Slope as a predictor of log(price).
 
 * * *
 
